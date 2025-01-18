@@ -88,6 +88,8 @@ func main() {
 	<-sigChan
 	close(exit)
 
+	//test
+
 	fmt.Println("Shutting down... Waiting for goroutines to finish...")
 
 	wg.Wait()
