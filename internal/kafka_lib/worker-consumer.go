@@ -9,7 +9,7 @@ import (
 )
 
 type WorkerConsumer struct {
-	id int
+	id       int
 	consumer *kafka.Consumer
 }
 
@@ -19,7 +19,6 @@ func NewWorkerConsumer(id int, addr, topic, group string) (*WorkerConsumer, erro
 		"group.id":          group,
 		"auto.offset.reset": "earliest",
 	})
-
 	if err != nil {
 		return nil, fmt.Errorf("failed to create consumer: %w", err)
 	}
@@ -29,14 +28,14 @@ func NewWorkerConsumer(id int, addr, topic, group string) (*WorkerConsumer, erro
 	}
 
 	return &WorkerConsumer{
-		id: id,
+		id:       id,
 		consumer: consumer,
 	}, nil
 }
 
 func (wc *WorkerConsumer) StartWork(exit chan struct{}) {
 	defer wc.consumer.Close()
-	
+
 	for {
 		select {
 		case <-exit:

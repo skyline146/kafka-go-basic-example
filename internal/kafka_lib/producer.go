@@ -15,7 +15,6 @@ func NewProducer(addr string) (*Producer, error) {
 	p, err := kafka.NewProducer(&kafka.ConfigMap{
 		"bootstrap.servers": addr,
 	})
-
 	if err != nil {
 		return nil, fmt.Errorf("failed to create producer: %w", err)
 	}
@@ -27,7 +26,7 @@ func (p *Producer) SendMessage(message, topic string) error {
 	msg := &kafka.Message{
 		TopicPartition: kafka.TopicPartition{
 			Partition: kafka.PartitionAny,
-			Topic: &topic,
+			Topic:     &topic,
 		},
 		Value: []byte(message),
 	}
@@ -43,7 +42,7 @@ func (p *Producer) SendMessage(message, topic string) error {
 	case *kafka.Message:
 		return nil
 	case kafka.Error:
-		return  fmt.Errorf("failed to send message to topic %s: %w", topic, msgEvent)
+		return fmt.Errorf("failed to send message to topic %s: %w", topic, msgEvent)
 	default:
 		return errors.New("unknown event type")
 	}
