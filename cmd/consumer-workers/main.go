@@ -8,12 +8,12 @@ import (
 	"strconv"
 	"sync"
 	"syscall"
+
 	"workers-kafka/internal/kafka_lib"
 
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
 	"github.com/joho/godotenv"
 )
-
 
 var (
 	topic = "test-topic"
@@ -43,7 +43,7 @@ func main() {
 
 	initConsumer, err := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers": KAFKA_ADDR,
-		"group.id": "init",
+		"group.id":          "init",
 	})
 	if err != nil {
 		log.Fatal(fmt.Errorf("failed to create init consumer: %w", err))
@@ -54,9 +54,9 @@ func main() {
 		log.Fatal(fmt.Errorf("failed to get topic metadata: %w", err))
 	}
 
-    if err = initConsumer.Close(); err != nil {
-        log.Fatal(fmt.Errorf("failed to shut down init consumer: %w", err))
-    }
+	if err = initConsumer.Close(); err != nil {
+		log.Fatal(fmt.Errorf("failed to shut down init consumer: %w", err))
+	}
 
 	numOfPartitions := len(metadata.Topics[topic].Partitions)
 
@@ -67,7 +67,7 @@ func main() {
 	var wg sync.WaitGroup
 	wg.Add(WORKERS_COUNT)
 
-    exit := make(chan struct{})
+	exit := make(chan struct{})
 
 	for i := 1; i <= WORKERS_COUNT; i++ {
 		go func() {
@@ -82,13 +82,13 @@ func main() {
 		}()
 	}
 
-    sigChan := make (chan os.Signal, 1)
-    signal.Notify(sigChan, syscall.SIGTERM, syscall.SIGINT)
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGTERM, syscall.SIGINT)
 
-    <-sigChan
-    close(exit)
+	<-sigChan
+	close(exit)
 
-    fmt.Println("Shutting down... Waiting for goroutines to finish...")
+	fmt.Println("Shutting down... Waiting for goroutines to finish...")
 
 	wg.Wait()
 }

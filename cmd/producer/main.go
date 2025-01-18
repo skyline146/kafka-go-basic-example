@@ -7,14 +7,13 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
 	"workers-kafka/internal/kafka_lib"
 
 	"github.com/joho/godotenv"
 )
 
-var (
-	topic = "test-topic"
-)
+var topic = "test-topic"
 
 func main() {
 	err := godotenv.Load()
@@ -28,7 +27,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	
+
 	defer producer.Close()
 
 	exit := make(chan struct{})
@@ -37,9 +36,9 @@ func main() {
 		i := 1
 		for {
 			select {
-			case <-exit: 
+			case <-exit:
 				return
-	
+
 			default:
 				msg := fmt.Sprintf("message #%d", i)
 				if err := producer.SendMessage(msg, topic); err != nil {
@@ -48,15 +47,15 @@ func main() {
 
 				fmt.Printf("Message `%s` successfully sent\n", msg)
 			}
-			
+
 			i++
 			time.Sleep(time.Millisecond * 500)
 		}
 	}()
-	
-	sigChan := make (chan os.Signal, 1)
-    signal.Notify(sigChan, syscall.SIGTERM, syscall.SIGINT)
 
-    <-sigChan
-    close(exit)
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGTERM, syscall.SIGINT)
+
+	<-sigChan
+	close(exit)
 }
